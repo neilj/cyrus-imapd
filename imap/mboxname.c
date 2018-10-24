@@ -1797,16 +1797,30 @@ EXPORTED void mboxname_hash(char *dest, size_t destlen,
     mbname_free(&mbname);
 }
 
+EXPORTED void mboxname_id_hash(char *dest, size_t destlen,
+                               const char *root,
+                               const char *id)
+{
+    struct buf buf = BUF_INITIALIZER;
+
+    buf_printf(&buf, "%s/%c/%c", root, id[0], id[1]);
+
+    /* for now, keep API even though we're doing a buffer inside here */
+    strncpy(dest, buf_cstring(&buf), destlen);
+
+    buf_free(&buf);
+}
+
 /* note: mboxname must be internal */
 EXPORTED char *mboxname_datapath(const char *partition,
                                  const char *mboxname,
-                                 const char *uniqueid __attribute__((unused)),
+                                 const char *uniqueid,
                                  unsigned long uid)
 {
     static char pathresult[MAX_MAILBOX_PATH+1];
     const char *root;
 
-    if (!partition) return NULL;
+    if (!partition || !uniqueid) return NULL;
 
     root = config_partitiondir(partition);
     if (!root) return NULL;
@@ -1816,7 +1830,7 @@ EXPORTED char *mboxname_datapath(const char *partition,
         return pathresult;
     }
 
-    mboxname_hash(pathresult, MAX_MAILBOX_PATH, root, mboxname);
+    mboxname_id_hash(pathresult, MAX_MAILBOX_PATH, root, uniqueid);
 
     if (uid) {
         int len = strlen(pathresult);
@@ -1833,13 +1847,13 @@ EXPORTED char *mboxname_datapath(const char *partition,
 /* note: mboxname must be internal */
 EXPORTED char *mboxname_archivepath(const char *partition,
                                     const char *mboxname,
-                                    const char *uniqueid __attribute__((unused)),
+                                    const char *uniqueid,
                                     unsigned long uid)
 {
     static char pathresult[MAX_MAILBOX_PATH+1];
     const char *root;
 
-    if (!partition) return NULL;
+    if (!partition || !uniqueid) return NULL;
 
     root = config_archivepartitiondir(partition);
     if (!root) root = config_partitiondir(partition);
@@ -1852,7 +1866,7 @@ EXPORTED char *mboxname_archivepath(const char *partition,
         return pathresult;
     }
 
-    mboxname_hash(pathresult, MAX_MAILBOX_PATH, root, mboxname);
+    mboxname_id_hash(pathresult, MAX_MAILBOX_PATH, root, uniqueid);
 
     if (uid) {
         int len = strlen(pathresult);
@@ -1898,7 +1912,7 @@ char *mboxname_lockpath_suffix(const char *mboxname,
 
 EXPORTED char *mboxname_metapath(const char *partition,
                                  const char *mboxname,
-                                 const char *uniqueid __attribute__((unused)),
+                                 const char *uniqueid,
                                  int metafile,
                                  int isnew)
 {
@@ -1909,7 +1923,7 @@ EXPORTED char *mboxname_metapath(const char *partition,
     const char *filename = NULL;
     char confkey[256];
 
-    if (!partition) return NULL;
+    if (!partition || !uniqueid) return NULL;
 
     *confkey = '\0';
 
@@ -1983,7 +1997,7 @@ EXPORTED char *mboxname_metapath(const char *partition,
         return metaresult;
     }
 
-    mboxname_hash(metaresult, MAX_MAILBOX_PATH, root, mboxname);
+    mboxname_id_hash(metaresult, MAX_MAILBOX_PATH, root, uniqueid);
 
     if (filename) {
         int len = strlen(metaresult);
