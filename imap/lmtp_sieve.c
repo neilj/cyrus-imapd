@@ -1888,7 +1888,7 @@ static int sieve_find_script(const char *user, const char *domain,
             if (!script) { /* default script */
                 char *bc_fname;
 
-                strlcat(fname, "defaultbc", size);
+                strlcat(fname, "/defaultbc", size);
 
                 bc_fname = sieve_getdefaultbcfname(fname);
                 if (bc_fname) {
@@ -1900,7 +1900,7 @@ static int sieve_find_script(const char *user, const char *domain,
             }
         }
 
-        snprintf(fname+len, size-len, "%s.bc", script);
+        snprintf(fname+len, size-len, "/%s.bc", script);
     }
 
     /* don't do this for ~username ones */
