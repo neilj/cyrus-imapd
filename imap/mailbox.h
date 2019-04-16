@@ -259,7 +259,6 @@ struct mailbox {
     char *part;
     char *acl;
     modseq_t foldermodseq;
-    int legacy_dir;
 
     struct index_header i;
 

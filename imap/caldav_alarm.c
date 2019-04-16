@@ -1149,11 +1149,11 @@ static void process_one_record(struct mailbox *mailbox, uint32_t imap_uid,
         return;
     }
 
-    if (mailbox->mbtype == MBTYPE_CALENDAR) {
+    if (mbtype_isa(mailbox->mbtype) == MBTYPE_CALENDAR) {
         process_valarms(mailbox, &record, floatingtz, runtime);
     }
 #ifdef WITH_JMAP
-    else if (mailbox->mbtype == MBTYPE_SUBMISSION) {
+    else if (mbtype_isa(mailbox->mbtype) == MBTYPE_JMAPSUBMIT) {
         if (record.internaldate > runtime) {
             update_alarmdb(mailbox->name, imap_uid, record.internaldate);
             return;
