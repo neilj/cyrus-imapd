@@ -5889,6 +5889,9 @@ HIDDEN int mailbox_rename_nocopy(struct mailbox *oldmailbox,
         }
     }
 
+    /* unless on a replica, bump the modseq */
+    if (!silent) mailbox_modseq_dirty(oldmailbox);
+
     return r;
 }
 
