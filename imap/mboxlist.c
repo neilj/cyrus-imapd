@@ -2756,6 +2756,9 @@ EXPORTED int mboxlist_renamemailbox(const mbentry_t *mbentry,
 
                 mboxevent_set_access(mboxevent, NULL, NULL, userid, newname, 1);
             }
+
+            sync_log_rename(oldname, newname);
+
             mailbox_close(&oldmailbox);
         }
     }
